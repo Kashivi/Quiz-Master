@@ -1,8 +1,5 @@
-from flask_sqlalchemy import SQLAlchemy  # type: ignore
-db = SQLAlchemy()
-
+from .database import db
 from werkzeug.security import generate_password_hash, check_password_hash
-
 from datetime import datetime
 
 class User(db.Model):
@@ -13,7 +10,6 @@ class User(db.Model):
     full_name = db.Column(db.String(80) , nullable = False)
     qualification = db.Column(db.String(30) , nullable = False)
     dob = db.Column(db.Date , nullable = False)
-    is_admin = db.Column(db.Boolean, default=False)
     scores = db.relationship("Score", backref = "user", lazy = True , cascade="all, delete-orphan")
 
     def set_password(self, password):

@@ -1,0 +1,15 @@
+.custom-gradient-bg {
+    background: linear-gradient(90deg, #2563eb 0%, #ec4899 100%);
+}
+.subject-card {
+    border-top: 4px solid #ec4899;
+    transition: box-shadow 0.3s ease;
+}
+.subject-card:hover {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+.gradient-btn {
+    background: linear-gradient(90deg, #3b82f6 0%, #ec4899 100%);
+    border: none;
+    color: white;
+}

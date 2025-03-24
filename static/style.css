@@ -1,0 +1,64 @@
+html {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+
+.main-heading {
+    font-size: 2.5rem;
+    margin-bottom: 2rem;
+    color: #fdfdfd;
+    text-align: center;
+}
+
+.login-button {
+    display: block;
+    width: 200px;
+    margin: 2rem auto;
+    padding: 15px 30px;
+    background-color: #6c2d93;
+    color: white;
+    text-decoration: none;
+    text-align: center;
+    border-radius: 5px;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+.register-button:hover {
+    background-color: #36103a;
+}
+
+.content-section {
+    background-color: #f4ede4;
+    padding: 40px;
+    margin: 40px 0;
+    border-radius: 10px;
+}
+
+.section-heading {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+    color: #4a154b;
+}
+
+
+
+@media (max-width: 768px) {
+    .container {
+        padding: 20px 15px;
+    }
+    
+    .main-heading {
+        font-size: 2rem;
+    }
+
+}
