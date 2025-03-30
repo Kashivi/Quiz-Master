@@ -1,5 +1,4 @@
 from .database import db
-from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 
 class User(db.Model):
@@ -12,11 +11,6 @@ class User(db.Model):
     dob = db.Column(db.Date , nullable = False)
     scores = db.relationship("Score", backref = "user", lazy = True , cascade="all, delete-orphan")
 
-    def set_password(self, password):
-        self.password = generate_password_hash(password)
-    
-    def check_password(self, password):
-        return check_password_hash(self.password, password)
     
 class Subject(db.Model):
     __tablename__ = "subject"
@@ -33,29 +27,35 @@ class Chapter(db.Model):
     description = db.Column(db.String(500) , nullable = False)
     subject_id = db.Column(db.Integer , db.ForeignKey('subject.id') , nullable = False)
     quizzes = db.relationship("Quiz", backref = "chapter", lazy = True , cascade="all, delete-orphan")
+    questions = db.relationship('Question', backref='chapter', lazy=True)
 
 class Quiz(db.Model):
     __tablename__ = "quiz"
     id = db.Column(db.Integer , primary_key = True)
+    name = db.Column(db.String(100), nullable=False) 
     chapter_id = db.Column(db.Integer , db.ForeignKey('chapter.id') , nullable = False)
+    subject_id = db.Column(db.Integer, db.ForeignKey('subject.id'), nullable=False) 
     date_of_quiz = db.Column(db.DateTime , nullable = False)
     time_duration = db.Column(db.String(5) , nullable = False)
     remarks = db.Column(db.String(500) , nullable = True)
-
     questions = db.relationship('Question', backref='quiz', lazy=True , cascade="all, delete-orphan")
     scores = db.relationship('Score', backref='quiz', lazy=True , cascade="all, delete-orphan")
 
 class Question(db.Model):
     __tablename__ = "question"
     id = db.Column(db.Integer , primary_key = True)
+    chapter_id = db.Column(db.Integer , db.ForeignKey('chapter.id') , nullable = False)
     quiz_id = db.Column(db.Integer , db.ForeignKey('quiz.id') , nullable = False)
+    question_number = db.Column(db.Integer, nullable=False)
     question_statement = db.Column(db.String(500) , nullable = False)
-    option1 = db.Column(db.String(255), nullable=False)
-    option2 = db.Column(db.String(255), nullable=False)
-    option3 = db.Column(db.String(255), nullable=False)
-    option4 = db.Column(db.String(255), nullable=False)
+    option1 = db.Column(db.String(500), nullable=False)
+    option2 = db.Column(db.String(500), nullable=False)
+    option3 = db.Column(db.String(500), nullable=False)
+    option4 = db.Column(db.String(500), nullable=False)
     correct_option = db.Column(db.Integer, nullable=False)
-    
+    q_title = db.Column(db.String(100), nullable=False)
+    __table_args__ = (db.UniqueConstraint('quiz_id', 'question_number', name='unique_question_per_quiz'),)
+
 class Score(db.Model):
     __tablename__ = "score"
     id = db.Column(db.Integer , primary_key = True)

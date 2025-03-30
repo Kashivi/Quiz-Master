@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Question</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='add_subject.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="card mt-4">
+            <div class="card-header">
+                <h4>Edit Quiz</h4>
+            </div>
+            <div class="card-body">
+                <form action="{{ url_for('edit_quiz', quiz_id=quiz.id) }}" method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">Quiz Name</label>
+                        <input type="text" class="form-control" name="name" value="{{ quiz.name }}" required>
+                    </div>
+    
+                    <label for="chapter_id" class="form-label">Select Chapter</label>
+                    <select class="form-control" name="chapter_id" required>
+                        {% for chapter in chapters %}
+                            <option value="{{ chapter.id }}" {% if chapter.id == quiz.chapter_id %} selected {% endif %}>
+                                {{ chapter.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+
+    
+                    <div class="mb-3">
+                        <label class="form-label">Quiz Date</label>
+                        <input type="date" class="form-control" name="date_of_quiz" value="{{ quiz.date_of_quiz.strftime('%Y-%m-%d') }}" required>
+                    </div>
+    
+                    <div class="mb-3">
+                        <label class="form-label">Time Duration (in minutes)</label>
+                        <input type="number" class="form-control" name="time_duration" value="{{ quiz.time_duration }}" required>
+                    </div>
+    
+                    <div class="mb-3">
+                        <label class="form-label">Remarks (Optional)</label>
+                        <textarea class="form-control" name="remarks" rows="2">{{ quiz.remarks }}</textarea>
+                    </div>
+    
+                    <div class="d-flex justify-content-between">
+                        <button type="submit" class="btn btn-success">Update Quiz</button>
+                        <a href="{{ url_for('quiz_management') }}" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
