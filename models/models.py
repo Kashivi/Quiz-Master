@@ -66,3 +66,11 @@ class Score(db.Model):
     total_scored = db.Column(db.Integer , default = 0)
     total_possible_score = db.Column(db.Integer, nullable = False)
     __table_args__ = (db.UniqueConstraint('quiz_id', 'user_id', 'attempt_number', name='unique_attempt'),)
+
+class Answer(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    quiz_id = db.Column(db.Integer, db.ForeignKey('quiz.id'), nullable=False)
+    question_id = db.Column(db.Integer, db.ForeignKey('question.id'), nullable=False)
+    selected_option = db.Column(db.Integer, nullable=False)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)

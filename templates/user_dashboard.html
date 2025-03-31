@@ -1,16 +1,138 @@
-<!-- templates/dashboard.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Dashboard</title>
-    <link rel="stylesheet" href="../static/user_dashboard.css">
+    <title>{{ page_title|default('QuizMaster Dashboard') }}</title>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='user_dashboard.css') }}">
 </head>
 <body>
-    <div class="dashboard-container">
-        <!-- Welcome Section -->
-        <header>
-            <h1>Welcome, User!</h1>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="brand">
+                <div class="brand-logo">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <div class="brand-name">{{ app_name|default('QuizMaster') }}</div>
+            </div>
+            
+            <ul class="nav-links">
+                {% set navigation_items = [
+                    {'name': 'Home', 'icon': 'fas fa-home', 'url': url_for('user_dashboard'), 'active': true},
+                    {'name': 'Scores', 'icon': 'fas fa-question-circle', 'url': url_for('quiz_score' , user_id=user_id, quiz_id=1), 'active': false},
+                    {'name': 'Summary', 'icon': 'fas fa-chart-bar', 'url': url_for('quiz_summary'), 'active': false},
+                    {'name': 'Logout', 'icon': 'fas fa-sign-out-alt', 'url': url_for('logout'), 'active': false}
+                ] %}
+                
+                {% for item in navigation_items %}
+                <li class="nav-item">
+                    <a href="{{ item.url|default('#') }}" class="nav-link {{ 'active' if item.active else '' }}">
+                        <i class="{{ item.icon }}"></i>
+                        <span>{{ item.name }}</span>
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
 
+            <div class="user-profile">
+                <div class="profile-info">
+                    <div class="profile-name">{{ user.full_name }}</div>
+                    <div class="profile-role">{{ user.qualification }}</div>
+                </div>
+            </div>
+            
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="header">
+                <h1 class="page-title">{{ dashboard_title|default('Dashboard') }}</h1>
+
+                <form action="{{ url_for('search') }}" method="get" class="search-form">
+                    <input type="text" name="query" placeholder="Search for subjects or quizzes..." required>
+                    <button type="submit">Search</button>
+                </form>
+            </div>
+
+            
+            
+            <!-- Dashboard Cards -->
+            <div class="dashboard-cards">
+                <!-- Total Quizzes Card -->
+                <div class="card">
+                    <i class="fas fa-clipboard-list"></i>
+                    <h3>Total Quizzes</h3>
+                    <p>{{ total_quizzes }}</p>
+                </div>
+            
+                <!-- Completed Quizzes Card -->
+                <div class="card">
+                    <i class="fas fa-check-circle"></i>
+                    <h3>Completed</h3>
+                    <p>{{ completed_quizzes }}</p>
+                </div>
+            
+                <!-- Average Score Card -->
+                
+            </div>
+            
+            <!-- Upcoming Quizzes Table -->
+            <div class="upcoming-quizzes">
+                <div class="quiz-header">
+                    <div class="quiz-title">
+                        <i class="fas fa-calendar-alt"></i>
+                        Upcoming Quizzes
+                    </div>
+                </div>
+                
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Quiz Name</th>
+                                <th>Questions</th>
+                                <th>Date</th>
+                                <th>Duration</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for quiz in quizzes %}
+                            <tr>
+                                <td class="quiz-id">{{ quiz.name }}  ({{quiz.chapter.name}})</td>
+                                <td>{{ quiz.questions|length }}</td>
+                                <td>{{ quiz.date_of_quiz.strftime('%b %d, %Y') }}</td>
+                                <td>{{ quiz.time_duration }} min</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <a href="{{ url_for('quiz_details', quiz_id=quiz.id) }}" class="btn btn-view">
+                                            View
+                                        </a>
+                                        <a href="{{ url_for('start_quiz', quiz_id=quiz.id) }}" class="btn btn-start">
+                                            Start 
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="5" class="no-quizzes">
+                                    No upcoming quizzes available
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
 </html>

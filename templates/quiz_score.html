@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Score</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='add_subject.css') }}">
+</head>
+<style>
+    .btn-dashboard {
+            border: 2px solid black;  
+            background-color: white;   
+            color: black;              
+            padding: 10px 20px;        
+            font-size: 1rem;          
+            text-align: center;        
+            text-decoration: none;     
+            border-radius: 5px;       
+            display: inline-block;     
+            margin: 20px auto;        
+        }
+
+        .btn-dashboard:hover {
+            background-color: black;   
+            color: white;              
+        }
+</style>
+<body>
+    <div class="container py-4">
+        <h2 class="text-center">Quiz Score Details</h2>
+
+        {% for quiz in quiz_scores %}
+        <div class="card mt-4">
+            <div class="card-body">
+                <h5 class="card-title">Quiz: {{ quiz.quiz_name }}</h5>
+                <p><strong>Score:</strong> {{ quiz.score }}</p>
+                <p><strong>Date of Attempt:</strong> 
+                    {{ quiz.date_of_attempt.strftime('%Y-%m-%d %H:%M:%S') if quiz.date_of_attempt else 'No attempt made' }}
+                </p>
+            </div>
+        </div>
+
+        <h3 class="mt-4">Answers from the First Attempt:</h3>
+        <table class="table table-bordered mt-3">
+            <thead>
+                <tr>
+                    <th>Your Answer</th>
+                    <th>Correct Answer?</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for answer in quiz.answers %}
+                <tr>
+                    <td>{{ answer.selected_option }}</td>
+                    <td>{% if answer.is_correct %}✅ Yes{% else %}❌ No{% endif %}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endfor %}
+
+        <a href="{{ url_for('user_dashboard') }}" class="btn-dashboard">
+            <i class="bi bi-plus-circle me-2"></i>
+                User Dashboard
+        </a>
+    </div>
+</body>
+</html>
+

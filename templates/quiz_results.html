@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Results</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='add_subject.css') }}">
+    <style>
+        /* Styling for the quiz result box */
+        .btn {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 10px 15px;
+            background: linear-gradient(to right, #2575fc 0%, #6a11cb 100%); /* Blue to Pink Gradient */
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            border: none;
+            font-weight: bold;
+        }
+
+
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+        .container {
+            max-width: 500px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border: 2px solid black; /* Black border around the box */
+            border-radius: 10px;
+            box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        h1 {
+            color: #333;
+        }
+        h4 {
+            margin: 10px 0;
+        }
+        .success {
+            color: green;
+            font-weight: bold;
+        }
+        .average {
+            color: pink;
+            font-weight: bold;
+        }
+        .fail {
+            color: red;
+            font-weight: bold;
+        }
+        
+        .btn:hover {
+            background: linear-gradient(to right, #1e60d0 0%, #590ea8 100%); /* Darker gradient on hover */
+            transform: scale(1.05); /* Small zoom effect */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Quiz Results</h1>
+        
+        <!-- Ensure 'quiz' object is available -->
+        {% if quiz %}
+            <h2>Quiz: {{ quiz.title }}</h2>
+            <p><strong>Quiz ID:</strong> {{ quiz.id }}</p>
+        {% else %}
+            <h2>Quiz Information Not Available</h2>
+        {% endif %}
+
+        <!-- Display score -->
+        <h4><strong>Your Score:</strong> {{ score }} / {{ total_questions }}</h4>
+        <h4><strong>Percentage:</strong> {{ percentage }}%</h4>
+
+        <!-- Message based on performance -->
+        {% if percentage >= 80 %}
+            <h4 class="success">🎉 Great job! You performed really well! </h4>
+        {% elif percentage >= 50 %}
+            <h4 class="average">👍 Good effort! Keep practicing!</h4>
+        {% else %}
+            <h4 class="fail">😢 Don't worry! Try again and improve your score.</h4>
+        {% endif %}
+
+        <!-- Go Back to Dashboard -->
+        <a href="{{ url_for('user_dashboard') }}" class="btn">
+            <i class="bi bi-plus-circle me-2"></i>
+                User Dashboard
+        </a>
+
+    </div>
+</body>
+</html>
+

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ quiz.name }} - Quiz</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='add_subject.css') }}">
+    <style>
+        .timer {
+        font-size: 1.5rem;
+        color: #dc3545;
+        font-weight: bold;
+    }
+
+    .question-card {
+        border: 1px solid #dee2e6;
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+        margin: 1rem 0;
+        background-color: white; /* Set background color to white */
+    }
+
+    .option-label {
+        display: block;
+        padding: 0.75rem;
+        margin: 0.5rem 0;
+        border: 1px solid #dee2e6;
+        border-radius: 0.25rem;
+        cursor: pointer;
+        background-color: white; /* Set background color to white */
+    }
+
+    .option-label:hover {
+        background-color: #f8f9fa; /* Light gray hover effect */
+    }
+
+    input[type="radio"]:checked + .option-label {
+        background-color: #e9ecef; /* Change checked option background */
+        border-color: #0d6efd;
+    }
+    </style>
+</head>
+<body>
+    <div class="container py-4">
+        <!-- Header Section -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>{{ quiz.name }}</h1>
+            <div class="timer" id="timer">
+                <p>Time Left: <span id="quiz-timer"></span></p>
+            </div>
+        </div>
+
+        <!-- Question Card -->
+        <div class="question-card">
+            <!-- Question Form (for Save & Next) -->
+            <form id="quizForm" method="POST" action="{{ url_for('save_answer') }}">
+                <input type="hidden" name="quiz_id" value="{{ quiz.id }}">
+                <input type="hidden" name="question_id" value="{{ question.id }}">
+                
+                <h3 class="mb-4">Question {{ question_num }} of {{ total_questions }}</h3>
+                <h4 class="mb-4">{{ question.question_statement }}</h4>
+            
+                <div class="options">
+                    {% for option_num in [1, 2, 3, 4] %}
+                    <div class="option">
+                        <input type="radio" name="selected_option" id="option{{ option_num }}" value="{{ option_num }}" required>
+                        <label class="option-label" for="option{{ option_num }}">{{ question['option' ~ option_num] }}</label>
+                    </div>
+                    {% endfor %}
+                </div>
+            
+                <div class="d-flex justify-content-between mt-4">
+                    {% if question_num < total_questions %}
+                    <button type="submit" name="action" value="next" class="btn btn-primary">Save & Next →</button>
+                    {% else %}
+                    <button type="submit" name="action" value="submit" class="btn btn-success">Submit Quiz ✅</button>
+                    {% endif %}
+                </div>
+            </form>
+            
+            
+            
+
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+    let endTime = JSON.parse('{{ end_time|tojson|safe }}');  // ✅ Correct format
+    let timerElement = document.getElementById("quiz-timer");
+
+    if (!timerElement) {
+        console.error("Error: Timer element not found.");
+        return;
+    }
+
+    // ✅ If endTime is invalid, prevent instant timeout
+    if (isNaN(endTime) || endTime == null || endTime < Date.now()) {
+        console.error("Error: Invalid endTime. Resetting timer.");
+        endTime = Date.now() + (30 * 60 * 1000);  // Default 30-minute timer
+    }
+
+    function updateTimer() {
+        let now = Date.now();
+        let timeLeft = endTime - now;
+
+        if (timeLeft <= 0) {
+            timerElement.innerHTML = "00:00";
+            alert("Time is up! Submitting the quiz.");
+            window.location.href = "{{ url_for('submit_quiz', quiz_id=quiz.id) }}";
+            return;
+        }
+
+        let minutes = Math.floor(timeLeft / 60000);
+        let seconds = Math.floor((timeLeft % 60000) / 1000);
+        timerElement.innerHTML = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    }
+
+    setInterval(updateTimer, 1000);
+    updateTimer();
+});
+
+
+    </script>
+    
+    
+    
+</body>
+</html>

@@ -1,0 +1,36 @@
+<!-- templates/subject_detail.html -->
+{% extends "user_dashboard.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>{{ subject.name }}</h2>
+    
+    {% if subject.description %}
+    <p class="lead">{{ subject.description }}</p>
+    {% endif %}
+
+    <h4>Quizzes in this Subject</h4>
+    
+    {% if subject.quizzes %}
+    <div class="list-group">
+        {% for quiz in subject.quizzes %}
+        <a href="{{ url_for('quiz_details', quiz_id=quiz.id) }}" 
+           class="list-group-item list-group-item-action">
+            {{ quiz.name }}
+            <span class="badge bg-primary float-end">
+                {{ quiz.questions|length }} Questions
+            </span>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="alert alert-warning mt-3">
+        No quizzes available in this subject yet.
+    </div>
+    {% endif %}
+
+    <a href="{{ url_for('user_dashboard') }}" class="btn btn-secondary mt-3">
+        Back to Dashboard
+    </a>
+</div>
+{% endblock %}
