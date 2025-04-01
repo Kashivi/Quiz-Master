@@ -294,7 +294,6 @@ def delete_quiz(quiz_id):
 
 @app.route('/user_dashboard')
 def user_dashboard():
-    
     current_user = User.query.get(session['user_id'])
 
     total_quizzes = Quiz.query.count()
@@ -302,8 +301,11 @@ def user_dashboard():
 
     user_scores = [score.total_scored for score in current_user.scores]
     
-    # Get upcoming quizzes (quizzes that haven't happened yet)
-    upcoming_quizzes = Quiz.query.filter(Quiz.date_of_quiz > datetime.utcnow()).all()
+    # Get today's date in UTC
+    today = datetime.utcnow().date()  # Only the date part (no time)
+
+    # Query for upcoming quizzes including today's quizzes
+    upcoming_quizzes = Quiz.query.filter(Quiz.date_of_quiz >= today).all()
     
     return render_template('user_dashboard.html',
                          user=current_user,
@@ -326,37 +328,47 @@ def start_quiz(quiz_id):
 
     quiz = Quiz.query.get_or_404(quiz_id)
 
-    # Get the current time
-    current_time = datetime.utcnow()
-    quiz_start_time = quiz.date_of_quiz
-    quiz_end_time = quiz_start_time + timedelta(minutes=int(quiz.time_duration))  # End time
+    # Get the current date (ignoring time)
+    current_date = datetime.utcnow().date()
 
-    if current_time < quiz_start_time:
+    # Get the quiz start and end dates (ignoring the time part)
+    quiz_start_date = quiz.date_of_quiz.date()  # Ignore time, only use date
+    quiz_end_date = quiz_start_date  # Use the same date for end date (since we are only dealing with date)
+
+    # Check if the quiz has started or is over based on the date
+    if current_date < quiz_start_date:
         flash("⏳ The quiz has not started yet!", "warning")
         return redirect(url_for('user_dashboard'))
 
-    if current_time > quiz_end_time:
+    if current_date > quiz_end_date:
         flash("The quiz time is over!", "danger")
         return redirect(url_for('user_dashboard'))
 
-    session['quiz_start_time'] = current_time.timestamp()
-    duration_seconds = int(quiz.time_duration) * 60
-    end_time = current_time.timestamp() + duration_seconds
+    # Set the session for quiz start time as timestamp
+    current_datetime = datetime.combine(current_date, datetime.min.time())
+    session['quiz_start_time'] = current_datetime.timestamp()
 
-    # Get all questions
+    # Ensure time_duration is treated as a float
+    end_time = current_datetime.timestamp() + (float(quiz.time_duration) * 60)  # Duration in seconds
+
+    # Get all questions for the quiz
     questions = Question.query.filter_by(quiz_id=quiz_id).all()
     if not questions:
         flash("⚠️ No questions available for this quiz!", "danger")
         return redirect(url_for('user_dashboard'))
 
+    # Pass end_time to the template
     return render_template(
         'quiz_interface.html',
         quiz=quiz,
         question=questions[0],
         question_num=1,
         total_questions=len(questions),
-        end_time=int(end_time * 1000)  
+        end_time=end_time  # Passing the correct value for end_time
     )
+
+
+
 
 
 
@@ -558,6 +570,9 @@ def quiz_interface(quiz_id, question_id):
 
 @app.route('/quiz_summary')
 def quiz_summary():
+    # Get the current logged-in user's ID
+    current_user_id = session.get('user_id')
+    
     # Query to aggregate quiz summary per user
     summary_query = (
         db.session.query(
@@ -572,6 +587,7 @@ def quiz_summary():
         .join(Score, User.id == Score.user_id)
         .join(Quiz, Score.quiz_id == Quiz.id)
         .join(Chapter, Quiz.chapter_id == Chapter.id)
+        .filter(User.id == current_user_id)  # Filter by current user
         .group_by(User.id, Quiz.id, Chapter.id)
         .all()
     )
